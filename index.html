@@ -4,30 +4,20 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="index, follow">
+<meta name="theme-color" content="#0c1322">
 <meta name="description" content="วิเคราะห์ทองคำ XAUUSD ด้วย AI 4 ตัว — แผนเทรด ข่าว ปฏิทินเศรษฐกิจ อัปเดตทุก 1 ชั่วโมง">
 <title>Gold AI Live — วิเคราะห์ทองคำด้วย AI</title>
 <style>
   :root {
-    --bg: #eef2f7; --card: #ffffff; --card2: #f6f9fc;
-    --line: #dbe3ee; --line2: #e7edf5;
-    --text: #16233a; --muted: #5d6b82; --muted2: #9aa7ba;
-    --gold: #b8821f; --gold2: #d49b2a; --gold-bg: #f8f1df;
-    --green-bg: #e2f2e9; --green-tx: #1d6b46;
-    --amber-bg: #fcefd9; --amber-tx: #8a5a0a;
-    --red-bg: #fdeaea; --red-tx: #b03030;
-    --shadow: 0 1px 3px rgba(20,40,80,.08), 0 2px 8px rgba(20,40,80,.05);
-  }
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --bg: #0c1322; --card: #16202f; --card2: #111a28;
-      --line: #243349; --line2: #1d2a3d;
-      --text: #e9eef6; --muted: #98a8bf; --muted2: #687893;
-      --gold: #e9b44c; --gold2: #f2c66d; --gold-bg: #2b2310;
-      --green-bg: #12372a; --green-tx: #84d6ad;
-      --amber-bg: #3a2a0a; --amber-tx: #f0c46a;
-      --red-bg: #3c161c; --red-tx: #f2a3a3;
-      --shadow: 0 1px 3px rgba(0,0,0,.4), 0 2px 8px rgba(0,0,0,.25);
-    }
+    color-scheme: dark;
+    --bg: #0c1322; --card: #16202f; --card2: #111a28;
+    --line: #243349; --line2: #1d2a3d;
+    --text: #e9eef6; --muted: #98a8bf; --muted2: #687893;
+    --gold: #e9b44c; --gold2: #f2c66d; --gold-bg: #2b2310;
+    --green-bg: #12372a; --green-tx: #84d6ad;
+    --amber-bg: #3a2a0a; --amber-tx: #f0c46a;
+    --red-bg: #3c161c; --red-tx: #f2a3a3;
+    --shadow: 0 1px 3px rgba(0,0,0,.4), 0 2px 8px rgba(0,0,0,.25);
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
@@ -113,10 +103,7 @@
     font-size: 11px; border-radius: 6px; padding: 2px 7px; margin-top: 6px;
     font-weight: 500;
   }
-  .source-mt5  { background: #e2f2e9; color: #1d6b46; }
-  @media (prefers-color-scheme: dark) {
-    .source-mt5  { background: #12372a; color: #84d6ad; }
-  }
+  .source-mt5  { background: #12372a; color: #84d6ad; }
 
   /* ── Price indicators row ── */
   .price-row { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
@@ -201,12 +188,8 @@
   .cal-time { font-size: 12px; color: var(--muted); min-width: 70px; flex-shrink: 0; margin-top: 2px; }
   .cal-title { flex: 1; }
   .cal-impact { font-size: 11px; border-radius: 5px; padding: 2px 7px; font-weight: 600; flex-shrink: 0; margin-top: 2px; }
-  .cal-high   { background: #fde8e8; color: #c0392b; }
+  .cal-high   { background: #4a1010; color: #f5a0a0; }
   .cal-medium { background: var(--amber-bg); color: var(--amber-tx); }
-  @media (prefers-color-scheme: dark) {
-    .cal-high   { background: #4a1010; color: #f5a0a0; }
-    .cal-medium { background: #3d2004; color: #f5c060; }
-  }
 
   /* ── Footer ── */
   footer {
@@ -278,7 +261,7 @@
   <!-- TradingView Chart -->
   <div class="tv-wrap">
     <iframe id="tvchart" title="กราฟราคาทองสด"
-      src="https://s.tradingview.com/widgetembed/?frameElementId=tvchart&symbol=OANDA%3AXAUUSD&interval=15&hidesidetoolbar=1&hidetoptoolbar=0&saveimage=0&toolbarbg=eef2f7&theme=light&style=1&timezone=Asia%2FBangkok&locale=th_TH&hide_legend=0"
+      src="https://s.tradingview.com/widgetembed/?frameElementId=tvchart&symbol=OANDA%3AXAUUSD&interval=15&hidesidetoolbar=1&hidetoptoolbar=0&saveimage=0&toolbarbg=0c1322&theme=dark&style=1&timezone=Asia%2FBangkok&locale=th_TH&hide_legend=0"
       style="width:100%; height:300px; border:0;" loading="lazy"></iframe>
   </div>
 
@@ -317,12 +300,6 @@
 <!-- Scroll to top -->
 <button class="back-top" id="backTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
 <script>
-// Dark mode TV chart
-if (matchMedia('(prefers-color-scheme: dark)').matches) {
-  const tv = document.getElementById('tvchart');
-  tv.src = tv.src.replace('theme=light','theme=dark').replace('toolbarbg=eef2f7','toolbarbg=0c1322');
-}
-
 function esc(s) {
   return String(s ?? '').replace(/[&<>"]/g,
     c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
