@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ตั้งค่า Gold AI Live — คู่มือการติดตั้ง</title>
+<style>
+  :root {
+    --bg: #f6f5f0; --card: #ffffff; --line: #e3e1d8;
+    --text: #2c2c2a; --muted: #76746c;
+    --gold: #ba7517; --gold-bg: #fdf6e8;
+    --green: #3b6d11; --green-bg: #eaf3de;
+    --shadow: 0 1px 4px rgba(0,0,0,.08);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1a1a18; --card: #232320; --line: #343330;
+      --text: #ececea; --muted: #a3a19a;
+      --gold: #ef9f27; --gold-bg: #2a2210;
+      --green: #9ed464; --green-bg: #1d3d08;
+    }
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg); color: var(--text);
+    font-family: -apple-system, "Segoe UI", "Noto Sans Thai", sans-serif;
+    line-height: 1.65;
+  }
+  .topbar {
+    background: var(--card); border-bottom: 1px solid var(--line);
+    padding: 12px 16px; display: flex; align-items: center; gap: 10px;
+    position: sticky; top: 0; z-index: 10;
+  }
+  .topbar a { color: var(--gold); text-decoration: none; font-size: 14px; }
+  .topbar-title { font-size: 16px; font-weight: 600; flex: 1; }
+  .page { max-width: 600px; margin: 0 auto; padding: 20px 16px 60px; }
+  h1 { font-size: 22px; font-weight: 700; margin-bottom: 6px; }
+  .subtitle { font-size: 15px; color: var(--muted); margin-bottom: 24px; }
+
+  /* Steps */
+  .steps { display: flex; flex-direction: column; gap: 0; }
+  .step {
+    display: flex; gap: 0; position: relative;
+  }
+  .step-left { display: flex; flex-direction: column; align-items: center; width: 40px; flex-shrink: 0; }
+  .step-num {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: var(--gold); color: white;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 700; flex-shrink: 0; z-index: 1;
+  }
+  .step-num.done { background: var(--green-bg); color: var(--green); border: 2px solid var(--green); }
+  .step-line {
+    width: 2px; background: var(--line); flex: 1; margin: 4px 0;
+    min-height: 20px;
+  }
+  .step:last-child .step-line { display: none; }
+  .step-body {
+    background: var(--card); border: 1px solid var(--line);
+    border-radius: 14px; padding: 16px; margin-bottom: 12px;
+    margin-left: 10px; flex: 1; box-shadow: var(--shadow);
+  }
+  .step-title { font-size: 16px; font-weight: 600; margin-bottom: 8px; }
+  .step-desc { font-size: 14px; color: var(--muted); margin-bottom: 12px; line-height: 1.7; }
+  .step-img-placeholder {
+    background: var(--bg); border: 1px dashed var(--line);
+    border-radius: 10px; padding: 20px; text-align: center;
+    color: var(--muted); font-size: 13px; margin-bottom: 12px;
+  }
+  .code-block {
+    background: #1a1a18; color: #d4c5a9;
+    border-radius: 10px; padding: 12px 14px; font-family: "Consolas","Fira Code",monospace;
+    font-size: 13px; overflow-x: auto; margin: 8px 0; position: relative;
+  }
+  .code-block .comment { color: #6e6c65; }
+  .code-block .hl { color: #ef9f27; }
+  .copy-btn {
+    position: absolute; top: 8px; right: 8px;
+    background: #333; color: #ccc; border: none; border-radius: 6px;
+    padding: 3px 8px; font-size: 11px; cursor: pointer;
+  }
+  .copy-btn:hover { background: #444; }
+  .tip {
+    background: var(--gold-bg); border-left: 3px solid var(--gold);
+    border-radius: 0 8px 8px 0; padding: 10px 12px;
+    font-size: 13px; margin: 8px 0;
+  }
+  .tip strong { color: var(--gold); }
+  .check-item {
+    display: flex; align-items: flex-start; gap: 8px;
+    font-size: 14px; padding: 6px 0; border-bottom: 1px solid var(--line);
+  }
+  .check-item:last-child { border-bottom: none; }
+  .check-icon { width: 20px; height: 20px; border-radius: 50%; flex-shrink: 0; margin-top: 1px;
+    display: flex; align-items: center; justify-content: center; font-size: 11px; }
+  .check-req  { background: #fde8e8; color: #c0392b; }
+  .check-nice { background: var(--gold-bg); color: var(--gold); }
+
+  /* Cost table */
+  .cost-table { width: 100%; border-collapse: collapse; font-size: 13px; margin: 10px 0; }
+  .cost-table th { text-align: left; padding: 6px 8px; background: var(--bg); color: var(--muted); font-weight: 600; }
+  .cost-table td { padding: 8px; border-bottom: 1px solid var(--line); }
+  .free-badge { background: var(--green-bg); color: var(--green); border-radius: 5px; padding: 2px 7px; font-size: 11px; font-weight: 600; }
+  .paid-badge { background: var(--gold-bg); color: var(--gold); border-radius: 5px; padding: 2px 7px; font-size: 11px; font-weight: 600; }
+
+  /* Done section */
+  .done-card {
+    background: var(--green-bg); border-radius: 16px; padding: 20px;
+    text-align: center; margin-top: 8px;
+  }
+  .done-card h2 { font-size: 20px; color: var(--green); margin-bottom: 6px; }
+  .done-card p { font-size: 14px; color: var(--muted); }
+  .url-box {
+    background: var(--card); border: 1px solid var(--line); border-radius: 10px;
+    padding: 10px 14px; font-family: monospace; font-size: 14px;
+    color: var(--gold); margin: 10px 0; word-break: break-all;
+  }
+  .btn {
+    display: inline-block; background: var(--gold); color: white;
+    border-radius: 10px; padding: 10px 20px; font-size: 14px; font-weight: 600;
+    text-decoration: none; margin-top: 6px;
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a href="index.html">← กลับหน้าหลัก</a>
+  <div class="topbar-title">⚙️ ตั้งค่า Gold AI Live</div>
+</div>
+
+<div class="page">
+  <h1>🚀 คู่มือตั้งค่าเว็บไซต์</h1>
+  <p class="subtitle">ทำครั้งเดียว ~10 นาที · เว็บของคุณอยู่ที่ github.io · เปิดจากมือถือได้ทุกที่</p>
+
+  <!-- Prerequisite -->
+  <div class="step-body" style="margin-bottom:20px">
+    <div class="step-title">📋 สิ่งที่ต้องเตรียม</div>
+    <div class="check-item"><div class="check-icon check-req">✕</div><div>บัญชี <strong>GitHub</strong> (ฟรี — <a href="https://github.com/signup" target="_blank" style="color:var(--gold)">สมัครที่นี่</a>)</div></div>
+    <div class="check-item"><div class="check-icon check-req">✕</div><div><strong>Gemini API Key</strong> (ฟรี 1,500 ครั้ง/วัน — <a href="https://aistudio.google.com/apikey" target="_blank" style="color:var(--gold)">ขอได้ที่นี่</a>)</div></div>
+    <div class="check-item"><div class="check-icon check-nice">○</div><div><strong>Anthropic API Key</strong> (ไม่บังคับ ~$2-4/เดือน ทำให้ตัวค้านเก่งขึ้น)</div></div>
+    <div class="check-item"><div class="check-icon check-nice">○</div><div><strong>MT5</strong> เปิดค้างไว้ (ราคา realtime จากโบรก — ถ้าไม่มีใช้ Yahoo ได้)</div></div>
+  </div>
+
+  <div class="steps">
+
+    <!-- Step 1 -->
+    <div class="step">
+      <div class="step-left">
+        <div class="step-num">1</div>
+        <div class="step-line"></div>
+      </div>
+      <div class="step-body">
+        <div class="step-title">สร้าง Repository บน GitHub</div>
+        <div class="step-desc">
+          เข้า <a href="https://github.com/new" target="_blank" style="color:var(--gold)">github.com/new</a><br>
+          · ชื่อ: <code>gold-ai-live</code><br>
+          · เลือก <strong>Public</strong> (ต้องเป็น Public ถึงจะใช้ GitHub Pages ฟรีได้)<br>
+          · กด <strong>Create repository</strong>
+        </div>
+        <div class="tip"><strong>💡 เหตุผลที่ต้อง Public:</strong> GitHub Pages ฟรีใช้ได้กับ Public repo เท่านั้น ข้อมูลที่อัปโหลดขึ้นคือราคา+ข่าวสาธารณะ ไม่มีข้อมูลส่วนตัว</div>
+      </div>
+    </div>
+
+    <!-- Step 2 -->
+    <div class="step">
+      <div class="step-left">
+        <div class="step-num">2</div>
+        <div class="step-line"></div>
+      </div>
+      <div class="step-body">
+        <div class="step-title">สร้าง Personal Access Token</div>
+        <div class="step-desc">
+          ไปที่ <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" style="color:var(--gold)">Settings → Developer settings → Fine-grained tokens</a><br><br>
+          กรอกข้อมูล:<br>
+          · Token name: <code>gold-ai-live</code><br>
+          · Expiration: เลือก <strong>No expiration</strong> หรือ 1 ปี<br>
+          · Repository access: <strong>Only select repositories</strong> → เลือก <code>gold-ai-live</code><br>
+          · Permissions → Contents → <strong>Read and write</strong><br>
+          · กด <strong>Generate token</strong> แล้วคัดลอก token ทันที!
+        </div>
+        <div class="tip"><strong>⚠️ สำคัญ:</strong> Token จะแสดงแค่ครั้งเดียว ถ้าปิดหน้าไปแล้วต้องสร้างใหม่</div>
+      </div>
+    </div>
+
+    <!-- Step 3 -->
+    <div class="step">
+      <div class="step-left">
+        <div class="step-num">3</div>
+        <div class="step-line"></div>
+      </div>
+      <div class="step-body">
+        <div class="step-title">ตั้งค่าไฟล์ .env</div>
+        <div class="step-desc">เปิดไฟล์ <code>.env</code> ในโฟลเดอร์ gold-ai-team แล้วใส่ค่า:</div>
+        <div class="code-block">
+          <span class="comment"># .env — ห้ามแชร์ไฟล์นี้กับใคร!</span><br>
+          GEMINI_API_KEY=<span class="hl">AIzaSy...xxxxxx</span><br>
+          GITHUB_TOKEN=<span class="hl">github_pat_...xxxxxx</span><br>
+          <span class="comment"># ถ้ามี Claude key (ไม่บังคับ):</span><br>
+          ANTHROPIC_API_KEY=<span class="hl">sk-ant-...xxxxxx</span><br>
+          <span class="comment"># Telegram (ปิดอยู่ตอนนี้ เปิดได้ใน config.yaml)</span><br>
+          TELEGRAM_BOT_TOKEN=<br>
+          TELEGRAM_CHAT_ID=
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 4 -->
+    <div class="step">
+      <div class="step-left">
+        <div class="step-num">4</div>
+        <div class="step-line"></div>
+      </div>
+      <div class="step-body">
+        <div class="step-title">ตั้งค่าไฟล์ config.yaml</div>
+        <div class="step-desc">เปิดไฟล์ <code>config.yaml</code> แก้บรรทัดนี้:</div>
+        <div class="code-block">
+          <span class="comment"># เปลี่ยน USERNAME เป็นชื่อบัญชี GitHub ของคุณ</span><br>
+          github_repo: "<span class="hl">ชื่อบัญชีคุณ</span>/gold-ai-live"
+        </div>
+        <div class="tip"><strong>ตัวอย่าง:</strong> ถ้าบัญชี GitHub ของคุณชื่อ <code>thana123</code> ให้ใส่ <code>"thana123/gold-ai-live"</code></div>
+      </div>
+    </div>
+
+    <!-- Step 5 -->
+    <div class="step">
+      <div class="step-left">
+        <div class="step-num">5</div>
+        <div class="step-line"></div>
+      </div>
+      <div class="step-body">
+        <div class="step-title">ติดตั้ง dependencies แล้วรันครั้งแรก</div>
+        <div class="step-desc">เปิด Command Prompt หรือ Terminal ในโฟลเดอร์นี้:</div>
+        <div class="code-block" style="position:relative">
+          <span class="comment"># ติดตั้ง (ทำครั้งเดียว)</span><br>
+          pip install -r requirements.txt<br><br>
+          <span class="comment"># ทดสอบการเชื่อมต่อ</span><br>
+          python main.py test<br><br>
+          <span class="comment"># วิเคราะห์ครั้งแรก + อัปโหลดขึ้นเว็บ</span><br>
+          python main.py scan
+        </div>
+        <div class="tip"><strong>ถ้าเห็น ✅ ทุกบรรทัด:</strong> ระบบพร้อมใช้งานแล้วค่ะ</div>
+      </div>
+    </div>
+
+    <!-- Step 6 -->
+    <div class="step">
+      <div class="step-left">
+        <div class="step-num">6</div>
+        <div class="step-line"></div>
+      </div>
+      <div class="step-body">
+        <div class="step-title">เปิด GitHub Pages</div>
+        <div class="step-desc">
+          1. เข้า repo ของคุณ: <code>github.com/ชื่อบัญชี/gold-ai-live</code><br>
+          2. คลิก <strong>Settings</strong> → <strong>Pages</strong><br>
+          3. Branch → เลือก <strong>main</strong> → Save<br>
+          4. รอ ~2 นาที แล้วเปิด URL:<br>
+        </div>
+        <div class="url-box">https://<span id="urlPlaceholder">ชื่อบัญชีคุณ</span>.github.io/gold-ai-live</div>
+        <div class="tip"><strong>💡 แชร์ลิงก์นี้ให้กลุ่มเทรดได้เลย</strong> — เปิดได้จากมือถือทุกที่ ไม่ต้องติดตั้งอะไร</div>
+      </div>
+    </div>
+
+    <!-- Step 7 (auto) -->
+    <div class="step">
+      <div class="step-left">
+        <div class="step-num">7</div>
+        <div class="step-line"></div>
+      </div>
+      <div class="step-body">
+        <div class="step-title">รันอัตโนมัติ (แนะนำ)</div>
+        <div class="step-desc">ดับเบิลคลิกไฟล์ <code>start_gold_bot.bat</code> แล้วทิ้งหน้าต่างค้างไว้<br>
+        ระบบจะส่งรายงานทุก 1 ชั่วโมง ตั้งแต่ 06:00–22:00</div>
+        <div class="tip">
+          <strong>อยากให้เริ่มเองตอนเปิดเครื่อง:</strong> คลิกขวา <code>start_gold_bot.bat</code> → Create shortcut → กด <code>Win+R</code> พิมพ์ <code>shell:startup</code> → ย้าย shortcut ไปไว้ในโฟลเดอร์นั้น
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /steps -->
+
+  <!-- Cost table -->
+  <div class="step-body" style="margin-top:8px">
+    <div class="step-title">💰 ค่าใช้จ่ายประมาณ</div>
+    <table class="cost-table">
+      <tr><th>บริการ</th><th>ใช้ทำอะไร</th><th>ราคา</th></tr>
+      <tr><td>Gemini API</td><td>วิเคราะห์ข่าว + แผนเทรด</td><td><span class="free-badge">ฟรี 1,500ครั้ง/วัน</span></td></tr>
+      <tr><td>GitHub Pages</td><td>โฮสต์เว็บไซต์</td><td><span class="free-badge">ฟรี</span></td></tr>
+      <tr><td>Yahoo/MT5</td><td>ดึงราคาทอง</td><td><span class="free-badge">ฟรี</span></td></tr>
+      <tr><td>Forex Factory</td><td>ปฏิทินเศรษฐกิจ</td><td><span class="free-badge">ฟรี</span></td></tr>
+      <tr><td>Anthropic Claude</td><td>ตัวค้านแผน (ไม่บังคับ)</td><td><span class="paid-badge">~$2-4/เดือน</span></td></tr>
+    </table>
+    <div class="tip" style="margin-top:8px"><strong>อยากใช้ฟรีล้วน:</strong> เปิด config.yaml แล้วใส่ <code>#</code> หน้าบรรทัด <code>checker_provider</code> และ <code>checker_model</code></div>
+  </div>
+
+  <!-- Done -->
+  <div class="done-card">
+    <h2>🎉 พร้อมใช้งาน!</h2>
+    <p>เปิดเว็บได้ที่:</p>
+    <div class="url-box">https://ชื่อบัญชีคุณ.github.io/gold-ai-live</div>
+    <p style="font-size:13px;color:var(--muted);margin-top:8px">แชร์ให้กลุ่มเทรด เปิดได้ทุกอุปกรณ์ · อัปเดตอัตโนมัติทุก 1 ชม.</p>
+    <a href="index.html" class="btn">กลับหน้าหลัก</a>
+  </div>
+
+</div><!-- /page -->
+</body>
+</html>
