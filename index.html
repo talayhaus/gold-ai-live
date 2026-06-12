@@ -26,7 +26,7 @@
     --body-font: "Inter", "Noto Sans Thai", -apple-system, "Segoe UI", sans-serif;
   }
   @media (prefers-color-scheme: dark) {
-    :root {
+    :root:not(.light) {
       --bg: #22272E; --card: #2D333B; --card2: #262C34;
       --line: #444C56; --line2: #373E47;
       --text: #CDD9E5; --muted: #768390; --muted2: #545D68;
@@ -36,6 +36,16 @@
       --red-bg: #3A2426; --red-tx: #E0918F;
       --nav-bg: rgba(34, 39, 46, .78);
     }
+  }
+  :root.dark {
+    --bg: #22272E; --card: #2D333B; --card2: #262C34;
+    --line: #444C56; --line2: #373E47;
+    --text: #CDD9E5; --muted: #768390; --muted2: #545D68;
+    --accent: #D4A85C; --accent2: #E0BC7A; --accent-bg: #32302A;
+    --green-bg: #1F3327; --green-tx: #7CC384;
+    --amber-bg: #3A3120; --amber-tx: #D9B36A;
+    --red-bg: #3A2426; --red-tx: #E0918F;
+    --nav-bg: rgba(34, 39, 46, .78);
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
@@ -266,7 +276,10 @@
     <div class="logo"><span class="prompt">&gt;</span> gold_ai_live<span class="cursor">_</span></div>
     <span class="live-dot" id="liveDot">loading...</span>
   </div>
-  <button class="refresh-btn" onclick="load(true)">[ refresh ]</button>
+  <div style="display:flex; gap:6px;">
+    <button class="refresh-btn" id="themeBtn" onclick="toggleTheme()" title="สลับโหมดสว่าง/มืด">[ ☾ ]</button>
+    <button class="refresh-btn" onclick="load(true)">[ refresh ]</button>
+  </div>
 </div>
 
 <div class="page">
@@ -319,10 +332,30 @@
 
 <button class="back-top" id="backTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">^</button>
 <script>
-if (matchMedia('(prefers-color-scheme: dark)').matches) {
-  const tv = document.getElementById('tvchart');
-  tv.src = tv.src.replace('theme=light','theme=dark').replace('toolbarbg=F5F2EE','toolbarbg=22272E');
+function isDark() {
+  const s = localStorage.getItem('theme');
+  if (s === 'dark') return true;
+  if (s === 'light') return false;
+  return matchMedia('(prefers-color-scheme: dark)').matches;
 }
+function applyTheme() {
+  const saved = localStorage.getItem('theme');
+  document.documentElement.classList.toggle('dark', saved === 'dark');
+  document.documentElement.classList.toggle('light', saved === 'light');
+  const d = isDark();
+  const tv = document.getElementById('tvchart');
+  if (d && tv.src.includes('theme=light')) {
+    tv.src = tv.src.replace('theme=light','theme=dark').replace('toolbarbg=F5F2EE','toolbarbg=22272E');
+  } else if (!d && tv.src.includes('theme=dark')) {
+    tv.src = tv.src.replace('theme=dark','theme=light').replace('toolbarbg=22272E','toolbarbg=F5F2EE');
+  }
+  document.getElementById('themeBtn').textContent = d ? '[ ☀ ]' : '[ ☾ ]';
+}
+function toggleTheme() {
+  localStorage.setItem('theme', isDark() ? 'light' : 'dark');
+  applyTheme();
+}
+applyTheme();
 
 function esc(s) {
   return String(s ?? '').replace(/[&<>"]/g,
