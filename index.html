@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="index, follow">
+<meta name="description" content="วิเคราะห์ทองคำ XAUUSD ด้วย AI 4 ตัว — แผนเทรด ข่าว ปฏิทินเศรษฐกิจ อัปเดตทุก 2 ชั่วโมง">
+<title>Gold AI Live — วิเคราะห์ทองคำด้วย AI</title>
+<style>
+  :root {
+    --bg: #f6f5f0; --card: #ffffff; --card2: #fafaf7;
+    --line: #e3e1d8; --line2: #ede9e0;
+    --text: #2c2c2a; --muted: #76746c; --muted2: #a09e97;
+    --gold: #ba7517; --gold2: #d4951f; --gold-bg: #fdf6e8;
+    --green-bg: #eaf3de; --green-tx: #3b6d11;
+    --amber-bg: #faeeda; --amber-tx: #854f0b;
+    --red-bg: #fcebeb; --red-tx: #a32d2d;
+    --shadow: 0 1px 3px rgba(0,0,0,.07), 0 2px 8px rgba(0,0,0,.04);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1a1a18; --card: #232320; --card2: #1e1e1c;
+      --line: #343330; --line2: #2e2d2a;
+      --text: #ececea; --muted: #a3a19a; --muted2: #6e6c65;
+      --gold: #ef9f27; --gold2: #f5b040; --gold-bg: #2a2210;
+      --green-bg: #1d3d08; --green-tx: #9ed464;
+      --amber-bg: #3d2004; --amber-tx: #f5c060;
+      --red-bg: #3d1010; --red-tx: #f5a0a0;
+      --shadow: 0 1px 3px rgba(0,0,0,.3), 0 2px 8px rgba(0,0,0,.2);
+    }
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg); color: var(--text);
+    font-family: -apple-system, "Segoe UI", "Noto Sans Thai", "Helvetica Neue", sans-serif;
+    line-height: 1.65; min-height: 100vh;
+  }
+
+  /* ── Nav bar ── */
+  .topbar {
+    position: sticky; top: 0; z-index: 100;
+    background: var(--card);
+    border-bottom: 1px solid var(--line);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    padding: 10px 16px;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 8px;
+    box-shadow: var(--shadow);
+  }
+  .topbar-left { display: flex; align-items: center; gap: 8px; }
+  .logo { font-size: 18px; font-weight: 700; letter-spacing: -.3px; white-space: nowrap; }
+  .logo span { color: var(--gold); }
+  .live-dot {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 11px; color: var(--muted); background: var(--bg);
+    border: 1px solid var(--line); border-radius: 20px;
+    padding: 3px 8px; white-space: nowrap;
+  }
+  .live-dot::before {
+    content: ""; width: 6px; height: 6px; border-radius: 50%;
+    background: #4caf50; flex-shrink: 0;
+    animation: pulse 2s infinite;
+  }
+  .live-dot.stale::before { background: #ef9f27; animation: none; }
+  .live-dot.error::before { background: #e53e3e; animation: none; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+  .refresh-btn {
+    border: none; background: var(--gold-bg); color: var(--gold);
+    border-radius: 8px; padding: 6px 12px; font-size: 13px; font-weight: 500;
+    cursor: pointer; transition: opacity .15s;
+  }
+  .refresh-btn:hover { opacity: .8; }
+  .setup-link {
+    font-size: 12px; color: var(--muted); text-decoration: none;
+    padding: 4px 8px; border-radius: 6px; border: 1px solid var(--line);
+  }
+  .setup-link:hover { background: var(--gold-bg); color: var(--gold); border-color: var(--gold); }
+
+  /* ── Layout ── */
+  .page { max-width: 600px; margin: 0 auto; padding: 14px 14px 40px; }
+
+  /* ── TradingView Chart ── */
+  .tv-wrap {
+    border-radius: 14px; overflow: hidden;
+    border: 1px solid var(--line); margin-bottom: 14px;
+    box-shadow: var(--shadow);
+  }
+
+  /* ── Verdict ── */
+  .verdict {
+    font-size: 16px; font-weight: 600; border-radius: 14px;
+    padding: 16px 18px; margin-bottom: 12px;
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  .v-green { background: var(--green-bg); color: var(--green-tx); }
+  .v-amber { background: var(--amber-bg); color: var(--amber-tx); }
+  .v-red   { background: var(--red-bg);   color: var(--red-tx); }
+  .flags { font-size: 13px; font-weight: 400; display: flex; flex-direction: column; gap: 4px; margin-top: 2px; }
+
+  /* ── Cards ── */
+  .card {
+    background: var(--card); border: 1px solid var(--line);
+    border-radius: 14px; padding: 16px 18px; margin-bottom: 12px;
+    box-shadow: var(--shadow);
+  }
+  .card-label {
+    font-size: 12px; font-weight: 600; letter-spacing: .04em;
+    text-transform: uppercase; color: var(--muted); margin-bottom: 10px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .price-big { font-size: 28px; font-weight: 700; letter-spacing: -.5px; line-height: 1.2; }
+  .price-change { font-size: 14px; font-weight: 400; color: var(--muted); }
+  .price-meta { font-size: 13px; color: var(--muted); margin-top: 6px; line-height: 1.6; }
+  .source-badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 11px; border-radius: 6px; padding: 2px 7px; margin-top: 6px;
+    font-weight: 500;
+  }
+  .source-mt5  { background: #eaf3de; color: #3b6d11; }
+  .source-yahoo { background: var(--amber-bg); color: var(--amber-tx); }
+  @media (prefers-color-scheme: dark) {
+    .source-mt5  { background: #1d3d08; color: #9ed464; }
+    .source-yahoo { background: #3d2004; color: #f5c060; }
+  }
+
+  /* ── Price indicators row ── */
+  .price-row { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+  .price-chip {
+    flex: 1; min-width: 80px;
+    background: var(--card2); border: 1px solid var(--line2);
+    border-radius: 10px; padding: 8px 12px; text-align: center;
+  }
+  .price-chip-label { font-size: 11px; color: var(--muted2); }
+  .price-chip-val { font-size: 15px; font-weight: 600; margin-top: 2px; }
+
+  /* ── Body text ── */
+  .body-text { white-space: pre-wrap; font-size: 15px; line-height: 1.7; }
+
+  /* ── Checker card ── */
+  .card-checker {
+    background: var(--card); border: 2px solid var(--red-tx);
+    border-radius: 14px; padding: 16px 18px; margin-bottom: 12px;
+    box-shadow: var(--shadow);
+  }
+  .card-checker .card-label { color: var(--red-tx); }
+  .conf-badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 12px; background: var(--red-bg); color: var(--red-tx);
+    border-radius: 8px; padding: 3px 10px; margin-bottom: 10px; font-weight: 500;
+  }
+
+  /* ── Confidence bar ── */
+  .conf-bar-wrap { margin-top: 8px; }
+  .conf-bar-bg { background: var(--line); border-radius: 4px; height: 6px; overflow: hidden; }
+  .conf-bar-fill { height: 6px; border-radius: 4px; transition: width .5s; }
+  .conf-bar-label { font-size: 11px; color: var(--muted); margin-top: 3px; }
+
+  /* ── History ── */
+  .history-card {
+    background: var(--card); border: 1px solid var(--line);
+    border-radius: 14px; padding: 16px 18px; margin-bottom: 12px;
+    box-shadow: var(--shadow);
+  }
+  details { border-top: 1px solid var(--line); }
+  details:first-of-type { border-top: none; }
+  details summary {
+    cursor: pointer; font-size: 14px; padding: 10px 4px;
+    list-style: none; display: flex; align-items: center;
+    justify-content: space-between; gap: 8px;
+  }
+  details summary::-webkit-details-marker { display: none; }
+  details summary::after { content: "›"; font-size: 16px; color: var(--muted); transform: rotate(90deg); transition: transform .2s; }
+  details[open] summary::after { transform: rotate(-90deg); }
+  details summary .sum-meta { font-size: 12px; color: var(--muted); white-space: nowrap; }
+  .sum-verdict {
+    font-size: 13px; font-weight: 500; flex: 1;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .history-entry { padding: 10px 4px 4px; }
+
+  /* ── Stale banner ── */
+  .stale-banner {
+    background: var(--amber-bg); color: var(--amber-tx);
+    font-size: 13px; border-radius: 12px; padding: 10px 14px;
+    margin-bottom: 12px; display: none; align-items: flex-start; gap: 8px;
+  }
+
+  /* ── Next-update countdown ── */
+  .next-update {
+    font-size: 12px; color: var(--muted);
+    background: var(--card2); border: 1px solid var(--line2);
+    border-radius: 10px; padding: 8px 12px; margin-bottom: 14px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .next-update-label { flex: 1; }
+  .next-update-time { font-weight: 600; color: var(--text); font-size: 13px; }
+  .countdown-bar-bg { flex-shrink: 0; width: 80px; height: 4px; background: var(--line); border-radius: 2px; overflow: hidden; }
+  .countdown-bar-fill { height: 4px; background: var(--gold); border-radius: 2px; transition: width 1s linear; }
+
+  /* ── Calendar ── */
+  .cal-event {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 8px 0; border-bottom: 1px solid var(--line2); font-size: 14px;
+  }
+  .cal-event:last-child { border-bottom: none; }
+  .cal-time { font-size: 12px; color: var(--muted); min-width: 70px; flex-shrink: 0; margin-top: 2px; }
+  .cal-title { flex: 1; }
+  .cal-impact { font-size: 11px; border-radius: 5px; padding: 2px 7px; font-weight: 600; flex-shrink: 0; margin-top: 2px; }
+  .cal-high   { background: #fde8e8; color: #c0392b; }
+  .cal-medium { background: var(--amber-bg); color: var(--amber-tx); }
+  @media (prefers-color-scheme: dark) {
+    .cal-high   { background: #4a1010; color: #f5a0a0; }
+    .cal-medium { background: #3d2004; color: #f5c060; }
+  }
+
+  /* ── Footer ── */
+  footer {
+    text-align: center; font-size: 12px; color: var(--muted);
+    padding: 24px 0 40px; border-top: 1px solid var(--line); margin-top: 12px;
+    line-height: 2;
+  }
+  footer a { color: var(--gold); text-decoration: none; }
+
+  /* ── Loading skeleton ── */
+  .skeleton {
+    background: linear-gradient(90deg, var(--line) 25%, var(--line2) 50%, var(--line) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: 6px; height: 18px; margin: 6px 0;
+  }
+  @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+  .skeleton.w60 { width: 60%; }
+  .skeleton.w80 { width: 80%; }
+  .skeleton.w40 { width: 40%; }
+  .skeleton.h32 { height: 32px; }
+
+  /* ── Error state ── */
+  .error-card {
+    background: var(--red-bg); color: var(--red-tx);
+    border-radius: 14px; padding: 20px; text-align: center; margin: 20px 0;
+  }
+  .error-card h3 { font-size: 16px; margin-bottom: 6px; }
+  .error-card p { font-size: 14px; }
+
+  /* ── Scroll to top ── */
+  .back-top {
+    position: fixed; bottom: 20px; right: 16px; z-index: 200;
+    width: 40px; height: 40px; border-radius: 12px;
+    background: var(--gold); color: white; border: none;
+    font-size: 18px; cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0,0,0,.2);
+    display: none; align-items: center; justify-content: center;
+    transition: opacity .2s;
+  }
+</style>
+</head>
+<body>
+
+<!-- ── Top Bar ── -->
+<div class="topbar">
+  <div class="topbar-left">
+    <div class="logo">🏆 Gold <span>AI</span> Live</div>
+    <span class="live-dot" id="liveDot">กำลังโหลด...</span>
+  </div>
+  <div style="display:flex;gap:6px;align-items:center;">
+    <a href="web_setup.html" class="setup-link" title="ตั้งค่าเว็บไซต์">⚙️ ตั้งค่า</a>
+    <button class="refresh-btn" onclick="load(true)">↻ รีเฟรช</button>
+  </div>
+</div>
+
+<div class="page">
+
+  <!-- Stale banner -->
+  <div class="stale-banner" id="staleBanner">
+    <span>⚠️</span>
+    <span>บทวิเคราะห์นี้เก่ากว่า 3 ชั่วโมงแล้ว — กราฟราคาข้างบนคือของสด แต่แผนอาจไม่ทันสถานการณ์</span>
+  </div>
+
+  <!-- Next update countdown -->
+  <div class="next-update" id="nextUpdateRow" style="display:none;">
+    <div class="next-update-label" id="nextUpdateLabel">อัปเดตถัดไป</div>
+    <div class="next-update-time" id="nextUpdateTime">—</div>
+    <div class="countdown-bar-bg"><div class="countdown-bar-fill" id="countdownBar" style="width:0%"></div></div>
+  </div>
+
+  <!-- TradingView Chart -->
+  <div class="tv-wrap">
+    <iframe id="tvchart" title="กราฟราคาทองสด"
+      src="https://s.tradingview.com/widgetembed/?frameElementId=tvchart&symbol=OANDA%3AXAUUSD&interval=15&hidesidetoolbar=1&hidetoptoolbar=0&saveimage=0&toolbarbg=f6f5f0&theme=light&style=1&timezone=Asia%2FBangkok&locale=th_TH&hide_legend=0"
+      style="width:100%; height:300px; border:0;" loading="lazy"></iframe>
+  </div>
+
+  <!-- Main content -->
+  <div id="mainContent">
+    <!-- skeleton loader -->
+    <div id="skeleton">
+      <div class="card">
+        <div class="skeleton h32 w60"></div>
+        <div class="skeleton w80" style="margin-top:10px"></div>
+        <div class="skeleton w40"></div>
+      </div>
+      <div class="card">
+        <div class="skeleton w40"></div>
+        <div class="skeleton w80"></div>
+        <div class="skeleton w60"></div>
+      </div>
+    </div>
+    <div id="latest"></div>
+  </div>
+
+  <!-- History -->
+  <div class="history-card" id="historyWrap" style="display:none;">
+    <div class="card-label">📜 รายงานย้อนหลัง</div>
+    <div id="history"></div>
+  </div>
+
+  <footer>
+    ข้อมูลและบทวิเคราะห์สร้างโดย AI เพื่อการศึกษาเท่านั้น<br>
+    <b>ไม่ใช่คำแนะนำการลงทุน</b> — การซื้อขายมีความเสี่ยง ผู้ลงทุนต้องตัดสินใจเอง<br>
+    ราคากราฟ: <a href="https://tradingview.com" target="_blank" rel="noopener">TradingView</a>
+    &nbsp;·&nbsp; บทวิเคราะห์อัปเดตทุก 2 ชม. ดูเวลากำกับ
+    &nbsp;·&nbsp; <a href="web_setup.html">วิธีติดตั้ง</a>
+  </footer>
+</div>
+
+<!-- Scroll to top -->
+<button class="back-top" id="backTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+<script>
+// Dark mode TV chart
+if (matchMedia('(prefers-color-scheme: dark)').matches) {
+  const tv = document.getElementById('tvchart');
+  tv.src = tv.src.replace('theme=light','theme=dark').replace('toolbarbg=f6f5f0','toolbarbg=1a1a18');
+}
+
+function esc(s) {
+  return String(s ?? '').replace(/[&<>"]/g,
+    c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+}
+function verdictCls(v) {
+  if (!v) return 'v-red';
+  const c0 = v.codePointAt(0);
+  if (c0 === 0x1F7E2) return 'v-green'; // 🟢
+  if (c0 === 0x1F7E1) return 'v-amber'; // 🟡
+  return 'v-red';
+}
+function confColor(c) {
+  if (c == null) return '#ccc';
+  if (c >= 7) return '#4caf50';
+  if (c >= 5) return '#ef9f27';
+  return '#e53e3e';
+}
+
+function renderCalendarText(text) {
+  if (!text) return '<span style="color:var(--muted)">ไม่มีข้อมูล</span>';
+  const lines = text.split('\n').filter(l => l.trim());
+  if (lines.length === 1 && lines[0].includes('ไม่มีข่าว')) {
+    return '<div style="color:var(--muted);font-size:14px">✅ ไม่มีข่าวสำคัญใน 48 ชม. ถัดไป</div>';
+  }
+  return lines.map(line => {
+    const m = line.match(/^[•\-]?\s*(\S+\s+\S+)\s*(?:น\.)?\s*[—–\-]\s*(.+?)(\s*🔥)?$/);
+    if (!m) return `<div class="cal-event"><div class="cal-title" style="color:var(--muted)">${esc(line)}</div></div>`;
+    const isHigh = !!m[3];
+    return `<div class="cal-event">
+      <div class="cal-time">${esc(m[1])}</div>
+      <div class="cal-title">${esc(m[2].trim())}</div>
+      ${isHigh ? '<span class="cal-impact cal-high">แรงมาก</span>' : '<span class="cal-impact cal-medium">ปานกลาง</span>'}
+    </div>`;
+  }).join('');
+}
+
+function renderEntry(e) {
+  const conf = e.confidence;
+  const confPct = conf != null ? Math.round((conf/10)*100) : 0;
+  const cal = e.calendar || '';
+  return `
+  <div class="verdict ${verdictCls(e.verdict)}">${esc(e.verdict)}
+    ${e.flags && e.flags.length ? `<div class="flags">${e.flags.map(f=>`<span>${esc(f)}</span>`).join('')}</div>` : ''}
+  </div>
+  <div class="card">
+    <div class="card-label">💰 ราคาทองตอนวิเคราะห์</div>
+    <div class="price-big">${esc(e.price)}
+      <span class="price-change">${(e.change > 0 ? '+' : '') + esc(e.change)}% วันนี้</span>
+    </div>
+    <span class="source-badge ${e.source === 'MT5' ? 'source-mt5' : 'source-yahoo'}">
+      ${e.source === 'MT5' ? '✅ ราคาสดจากโบรก' : '⚠️ ราคาสำรอง (Yahoo ~15 นาที)'}
+    </span>
+    <div class="price-meta">ภาพรวม: ${esc(e.trend)}</div>
+    <div class="price-row">
+      <div class="price-chip"><div class="price-chip-label">ต่ำสุดวัน</div><div class="price-chip-val">${esc(e.day_low)}</div></div>
+      <div class="price-chip"><div class="price-chip-label">สูงสุดวัน</div><div class="price-chip-val">${esc(e.day_high)}</div></div>
+    </div>
+    ${e.momentum ? `<div class="price-meta" style="margin-top:8px">${esc(e.momentum)}</div>` : ''}
+  </div>
+  <div class="card">
+    <div class="card-label">📰 ข่าวที่ต้องรู้</div>
+    <div class="body-text">${esc(e.news)}</div>
+  </div>
+  <div class="card">
+    <div class="card-label">🎯 แผนเทรด (intraday)</div>
+    <div class="body-text">${esc(e.plan)}</div>
+  </div>
+  <div class="card-checker">
+    <div class="card-label">🛡 เสียงค้าน — อ่านก่อนตัดสินใจเสมอ</div>
+    ${conf != null ? `<span class="conf-badge">ความเชื่อมั่นในแผน ${esc(conf)}/10</span>
+    <div class="conf-bar-wrap">
+      <div class="conf-bar-bg"><div class="conf-bar-fill" style="width:${confPct}%;background:${confColor(conf)}"></div></div>
+      <div class="conf-bar-label">${conf >= 7 ? 'แผนผ่าน' : conf >= 5 ? 'มีจุดระวัง' : 'แผนมีจุดอ่อน'}</div>
+    </div>` : ''}
+    <div class="body-text" style="margin-top:10px">${esc(e.check)}</div>
+  </div>
+  <div class="card">
+    <div class="card-label">📅 ประกาศสำคัญที่กำลังจะมา (เวลาไทย)</div>
+    ${renderCalendarText(cal)}
+  </div>`;
+}
+
+let countdownInterval = null;
+function startCountdown(fromTimeMs) {
+  if (countdownInterval) clearInterval(countdownInterval);
+  const row = document.getElementById('nextUpdateRow');
+  const timeEl = document.getElementById('nextUpdateTime');
+  const bar = document.getElementById('countdownBar');
+  const label = document.getElementById('nextUpdateLabel');
+  function tick() {
+    const now = Date.now();
+    const nextMs = fromTimeMs + 2 * 3600 * 1000;
+    const diff = nextMs - now;
+    if (diff <= 0) { timeEl.textContent = 'กำลังอัปเดต...'; bar.style.width='100%'; return; }
+    const m = Math.floor(diff / 60000);
+    const s = Math.floor((diff % 60000) / 1000);
+    const elapsed = now - fromTimeMs;
+    const pct = Math.min(100, Math.round((elapsed / (2*3600000)) * 100));
+    timeEl.textContent = m + ' นาที ' + s + ' วินาที';
+    bar.style.width = pct + '%';
+    label.textContent = 'ผ่านไปแล้ว';
+    row.style.display = 'flex';
+  }
+  tick();
+  countdownInterval = setInterval(tick, 1000);
+}
+
+let lastHash = null;
+async function load(force) {
+  const dot = document.getElementById('liveDot');
+  dot.className = 'live-dot';
+  try {
+    const r = await fetch('data.json?t=' + Date.now(), {cache: 'no-store'});
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const data = await r.json();
+    if (!Array.isArray(data) || !data.length) throw new Error('empty');
+    const hash = data[0].time + data[0].price;
+    if (hash === lastHash && !force) return;
+    lastHash = hash;
+    const latest = data[0];
+    document.getElementById('skeleton').style.display = 'none';
+    document.getElementById('latest').innerHTML = renderEntry(latest);
+    dot.textContent = 'อัปเดต ' + latest.time;
+    dot.className = 'live-dot';
+    // stale check
+    const m2 = (latest.time||'').match(/(\d{2})\/(\d{2})\/(\d{4}) (\d{2}):(\d{2})/);
+    if (m2) {
+      const t = new Date(+m2[3], +m2[2]-1, +m2[1], +m2[4], +m2[5]);
+      if (Date.now() - t.getTime() > 3*3600000)
+        document.getElementById('staleBanner').style.display = 'flex';
+      startCountdown(t.getTime());
+    }
+    // history
+    const hist = data.slice(1, 25);
+    if (hist.length) {
+      document.getElementById('history').innerHTML = hist.map(e => `
+        <details>
+          <summary>
+            <span class="sum-verdict">${esc(e.verdict ? e.verdict.slice(0,55) : '—')}</span>
+            <span class="sum-meta">${esc(e.time)}</span>
+          </summary>
+          <div class="history-entry">${renderEntry(e)}</div>
+        </details>`).join('');
+      document.getElementById('historyWrap').style.display = 'block';
+    }
+  } catch(err) {
+    document.getElementById('skeleton').style.display = 'none';
+    if (!document.getElementById('latest').innerHTML) {
+      document.getElementById('latest').innerHTML = `
+        <div class="error-card">
+          <h3>⚠️ โหลดข้อมูลไม่สำเร็จ</h3>
+          <p>ยังไม่มีไฟล์ข้อมูล หรือระบบยังไม่ได้รัน<br>
+          ลอง: <code>python main.py scan</code></p>
+        </div>`;
+    }
+    dot.textContent = 'โหลดไม่ได้'; dot.className = 'live-dot error';
+  }
+}
+
+const backTop = document.getElementById('backTop');
+window.addEventListener('scroll', () => {
+  backTop.style.display = window.scrollY > 400 ? 'flex' : 'none';
+});
+
+load(true);
+setInterval(() => load(false), 60000);
+</script>
+</body>
+</html>
