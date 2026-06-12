@@ -4,146 +4,163 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="index, follow">
-<meta name="theme-color" content="#0c1322">
+<meta name="theme-color" content="#F5F2EE" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#22272E" media="(prefers-color-scheme: dark)">
 <meta name="description" content="วิเคราะห์ทองคำ XAUUSD ด้วย AI 4 ตัว — แผนเทรด ข่าว ปฏิทินเศรษฐกิจ อัปเดตทุก 1 ชั่วโมง">
 <title>Gold AI Live — วิเคราะห์ทองคำด้วย AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Inter:wght@400;500;600&family=Noto+Sans+Thai:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
-    color-scheme: dark;
-    --bg: #0c1322; --card: #16202f; --card2: #111a28;
-    --line: #243349; --line2: #1d2a3d;
-    --text: #e9eef6; --muted: #98a8bf; --muted2: #687893;
-    --gold: #e9b44c; --gold2: #f2c66d; --gold-bg: #2b2310;
-    --green-bg: #12372a; --green-tx: #84d6ad;
-    --amber-bg: #3a2a0a; --amber-tx: #f0c46a;
-    --red-bg: #3c161c; --red-tx: #f2a3a3;
-    --shadow: 0 1px 3px rgba(0,0,0,.4), 0 2px 8px rgba(0,0,0,.25);
+    color-scheme: light dark;
+    --bg: #F5F2EE; --card: #FFFFFF; --card2: #EFEAE3;
+    --line: #E2DCD2; --line2: #EAE4DA;
+    --text: #26231F; --muted: #6B655C; --muted2: #9C958A;
+    --accent: #8A6D3B; --accent2: #A8854A; --accent-bg: #F0E9DC;
+    --green-bg: #E7EEDF; --green-tx: #4A6332;
+    --amber-bg: #F3E8D3; --amber-tx: #7A5A1E;
+    --red-bg: #F3DEDA; --red-tx: #8C3A2E;
+    --nav-bg: rgba(245, 242, 238, .78);
+    --mono: "JetBrains Mono", "Noto Sans Thai", monospace;
+    --body-font: "Inter", "Noto Sans Thai", -apple-system, "Segoe UI", sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #22272E; --card: #2D333B; --card2: #262C34;
+      --line: #444C56; --line2: #373E47;
+      --text: #CDD9E5; --muted: #768390; --muted2: #545D68;
+      --accent: #D4A85C; --accent2: #E0BC7A; --accent-bg: #32302A;
+      --green-bg: #1F3327; --green-tx: #7CC384;
+      --amber-bg: #3A3120; --amber-tx: #D9B36A;
+      --red-bg: #3A2426; --red-tx: #E0918F;
+      --nav-bg: rgba(34, 39, 46, .78);
+    }
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
     background: var(--bg); color: var(--text);
-    font-family: -apple-system, "Segoe UI", "Noto Sans Thai", "Helvetica Neue", sans-serif;
+    font-family: var(--body-font);
     line-height: 1.65; min-height: 100vh;
   }
 
-  /* ── Nav bar ── */
+  /* ── Frosted nav ── */
   .topbar {
     position: sticky; top: 0; z-index: 100;
-    background: var(--card);
+    background: var(--nav-bg);
     border-bottom: 1px solid var(--line);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    padding: 10px 16px;
-    display: flex; align-items: center; justify-content: space-between;
-    gap: 8px;
-    box-shadow: var(--shadow);
+    padding: 12px 16px;
+    display: flex; align-items: center; justify-content: space-between; gap: 8px;
   }
-  .topbar-left { display: flex; align-items: center; gap: 8px; }
-  .logo { font-size: 18px; font-weight: 700; letter-spacing: -.3px; white-space: nowrap; }
-  .logo span { color: var(--gold); }
+  .topbar-left { display: flex; align-items: center; gap: 10px; }
+  .logo {
+    font-family: var(--mono); font-size: 15px; font-weight: 600;
+    letter-spacing: -.3px; white-space: nowrap;
+  }
+  .logo .prompt { color: var(--accent); }
+  .logo .cursor { animation: blink 1.2s steps(1) infinite; color: var(--accent); }
+  @keyframes blink { 50% { opacity: 0; } }
   .live-dot {
-    display: inline-flex; align-items: center; gap: 4px;
-    font-size: 11px; color: var(--muted); background: var(--bg);
-    border: 1px solid var(--line); border-radius: 20px;
+    display: inline-flex; align-items: center; gap: 6px;
+    font-family: var(--mono); font-size: 10px; color: var(--muted);
+    background: var(--card); border: 1px solid var(--line);
     padding: 3px 8px; white-space: nowrap;
   }
   .live-dot::before {
-    content: ""; width: 6px; height: 6px; border-radius: 50%;
-    background: #4caf50; flex-shrink: 0;
+    content: ""; width: 6px; height: 6px;
+    background: #5a9e6f; flex-shrink: 0;
     animation: pulse 2s infinite;
   }
-  .live-dot.stale::before { background: #ef9f27; animation: none; }
-  .live-dot.error::before { background: #e53e3e; animation: none; }
-  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+  .live-dot.stale::before { background: #c4953a; animation: none; }
+  .live-dot.error::before { background: #b5564a; animation: none; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.35} }
   .refresh-btn {
-    border: none; background: var(--gold-bg); color: var(--gold);
-    border-radius: 8px; padding: 6px 12px; font-size: 13px; font-weight: 500;
-    cursor: pointer; transition: opacity .15s;
+    font-family: var(--mono); font-size: 12px; font-weight: 500;
+    border: 1px solid var(--line); background: var(--card); color: var(--text);
+    padding: 6px 12px; cursor: pointer; transition: border-color .15s;
   }
-  .refresh-btn:hover { opacity: .8; }
-  .setup-link { display: none; }
+  .refresh-btn:hover { border-color: var(--accent); color: var(--accent); }
 
   /* ── Layout ── */
   .page { max-width: 600px; margin: 0 auto; padding: 14px 14px 40px; }
 
-  /* ── TradingView Chart ── */
-  .tv-wrap {
-    border-radius: 14px; overflow: hidden;
-    border: 1px solid var(--line); margin-bottom: 14px;
-    box-shadow: var(--shadow);
-  }
+  /* ── Chart ── */
+  .tv-wrap { border: 1px solid var(--line); margin-bottom: 14px; background: var(--card); }
 
   /* ── Verdict ── */
   .verdict {
-    font-size: 16px; font-weight: 600; border-radius: 14px;
-    padding: 16px 18px; margin-bottom: 12px;
-    display: flex; flex-direction: column; gap: 6px;
+    font-size: 15px; font-weight: 600;
+    padding: 14px 16px; margin-bottom: 12px;
+    border: 1px solid; display: flex; flex-direction: column; gap: 6px;
   }
-  .v-green { background: var(--green-bg); color: var(--green-tx); }
-  .v-amber { background: var(--amber-bg); color: var(--amber-tx); }
-  .v-red   { background: var(--red-bg);   color: var(--red-tx); }
+  .v-green { background: var(--green-bg); color: var(--green-tx); border-color: var(--green-tx); }
+  .v-amber { background: var(--amber-bg); color: var(--amber-tx); border-color: var(--amber-tx); }
+  .v-red   { background: var(--red-bg);   color: var(--red-tx);   border-color: var(--red-tx); }
   .flags { font-size: 13px; font-weight: 400; display: flex; flex-direction: column; gap: 4px; margin-top: 2px; }
 
   /* ── Cards ── */
   .card {
     background: var(--card); border: 1px solid var(--line);
-    border-radius: 14px; padding: 16px 18px; margin-bottom: 12px;
-    box-shadow: var(--shadow);
+    padding: 16px 18px; margin-bottom: 12px;
   }
   .card-label {
-    font-size: 12px; font-weight: 600; letter-spacing: .04em;
-    text-transform: uppercase; color: var(--muted); margin-bottom: 10px;
-    display: flex; align-items: center; gap: 6px;
+    font-family: var(--mono); font-size: 11px; font-weight: 600;
+    letter-spacing: .05em; color: var(--muted); margin-bottom: 10px;
   }
-  .price-big { font-size: 28px; font-weight: 700; letter-spacing: -.5px; line-height: 1.2; }
-  .price-change { font-size: 14px; font-weight: 400; color: var(--muted); }
+  .card-label::before { content: "// "; color: var(--muted2); }
+  .price-big {
+    font-family: var(--mono); font-size: 28px; font-weight: 600;
+    letter-spacing: -.5px; line-height: 1.2;
+  }
+  .price-change { font-family: var(--mono); font-size: 13px; font-weight: 400; color: var(--muted); }
   .price-meta { font-size: 13px; color: var(--muted); margin-top: 6px; line-height: 1.6; }
   .source-badge {
     display: inline-flex; align-items: center; gap: 4px;
-    font-size: 11px; border-radius: 6px; padding: 2px 7px; margin-top: 6px;
-    font-weight: 500;
+    font-family: var(--mono); font-size: 10px; font-weight: 500;
+    padding: 2px 8px; margin-top: 8px;
+    background: var(--green-bg); color: var(--green-tx);
+    border: 1px solid var(--green-tx);
   }
-  .source-mt5  { background: #12372a; color: #84d6ad; }
 
-  /* ── Price indicators row ── */
-  .price-row { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+  /* ── Price chips ── */
+  .price-row { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
   .price-chip {
     flex: 1; min-width: 80px;
     background: var(--card2); border: 1px solid var(--line2);
-    border-radius: 10px; padding: 8px 12px; text-align: center;
+    padding: 8px 12px; text-align: center;
   }
-  .price-chip-label { font-size: 11px; color: var(--muted2); }
-  .price-chip-val { font-size: 15px; font-weight: 600; margin-top: 2px; }
+  .price-chip-label { font-family: var(--mono); font-size: 10px; color: var(--muted2); }
+  .price-chip-val { font-family: var(--mono); font-size: 15px; font-weight: 600; margin-top: 2px; }
 
   /* ── Body text ── */
-  .body-text { white-space: pre-wrap; font-size: 15px; line-height: 1.7; }
+  .body-text { white-space: pre-wrap; font-size: 15px; line-height: 1.75; }
 
   /* ── Checker card ── */
   .card-checker {
     background: var(--card); border: 2px solid var(--red-tx);
-    border-radius: 14px; padding: 16px 18px; margin-bottom: 12px;
-    box-shadow: var(--shadow);
+    padding: 16px 18px; margin-bottom: 12px;
   }
   .card-checker .card-label { color: var(--red-tx); }
   .conf-badge {
-    display: inline-flex; align-items: center; gap: 4px;
-    font-size: 12px; background: var(--red-bg); color: var(--red-tx);
-    border-radius: 8px; padding: 3px 10px; margin-bottom: 10px; font-weight: 500;
+    display: inline-flex; align-items: center;
+    font-family: var(--mono); font-size: 11px; font-weight: 500;
+    background: var(--red-bg); color: var(--red-tx);
+    border: 1px solid var(--red-tx);
+    padding: 3px 10px; margin-bottom: 10px;
   }
-
-  /* ── Confidence bar ── */
   .conf-bar-wrap { margin-top: 8px; }
-  .conf-bar-bg { background: var(--line); border-radius: 4px; height: 6px; overflow: hidden; }
-  .conf-bar-fill { height: 6px; border-radius: 4px; transition: width .5s; }
-  .conf-bar-label { font-size: 11px; color: var(--muted); margin-top: 3px; }
+  .conf-bar-bg { background: var(--line2); height: 6px; overflow: hidden; }
+  .conf-bar-fill { height: 6px; transition: width .5s; }
+  .conf-bar-label { font-family: var(--mono); font-size: 10px; color: var(--muted); margin-top: 4px; }
 
   /* ── History ── */
   .history-card {
     background: var(--card); border: 1px solid var(--line);
-    border-radius: 14px; padding: 16px 18px; margin-bottom: 12px;
-    box-shadow: var(--shadow);
+    padding: 16px 18px; margin-bottom: 12px;
   }
-  details { border-top: 1px solid var(--line); }
+  details { border-top: 1px solid var(--line2); }
   details:first-of-type { border-top: none; }
   details summary {
     cursor: pointer; font-size: 14px; padding: 10px 4px;
@@ -151,9 +168,12 @@
     justify-content: space-between; gap: 8px;
   }
   details summary::-webkit-details-marker { display: none; }
-  details summary::after { content: "›"; font-size: 16px; color: var(--muted); transform: rotate(90deg); transition: transform .2s; }
+  details summary::after {
+    content: ">"; font-family: var(--mono); font-size: 13px;
+    color: var(--muted); transform: rotate(90deg); transition: transform .2s;
+  }
   details[open] summary::after { transform: rotate(-90deg); }
-  details summary .sum-meta { font-size: 12px; color: var(--muted); white-space: nowrap; }
+  details summary .sum-meta { font-family: var(--mono); font-size: 11px; color: var(--muted); white-space: nowrap; }
   .sum-verdict {
     font-size: 13px; font-weight: 500; flex: 1;
     overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
@@ -163,21 +183,23 @@
   /* ── Stale banner ── */
   .stale-banner {
     background: var(--amber-bg); color: var(--amber-tx);
-    font-size: 13px; border-radius: 12px; padding: 10px 14px;
+    border: 1px solid var(--amber-tx);
+    font-size: 13px; padding: 10px 14px;
     margin-bottom: 12px; display: none; align-items: flex-start; gap: 8px;
   }
 
-  /* ── Next-update countdown ── */
+  /* ── Countdown ── */
   .next-update {
-    font-size: 12px; color: var(--muted);
+    font-family: var(--mono); font-size: 11px; color: var(--muted);
     background: var(--card2); border: 1px solid var(--line2);
-    border-radius: 10px; padding: 8px 12px; margin-bottom: 14px;
+    padding: 8px 12px; margin-bottom: 14px;
     display: flex; align-items: center; gap: 8px;
   }
   .next-update-label { flex: 1; }
-  .next-update-time { font-weight: 600; color: var(--text); font-size: 13px; }
-  .countdown-bar-bg { flex-shrink: 0; width: 80px; height: 4px; background: var(--line); border-radius: 2px; overflow: hidden; }
-  .countdown-bar-fill { height: 4px; background: var(--gold); border-radius: 2px; transition: width 1s linear; }
+  .next-update-label::before { content: "> "; color: var(--accent); }
+  .next-update-time { font-weight: 600; color: var(--text); font-size: 12px; }
+  .countdown-bar-bg { flex-shrink: 0; width: 80px; height: 4px; background: var(--line); overflow: hidden; }
+  .countdown-bar-fill { height: 4px; background: var(--accent); transition: width 1s linear; }
 
   /* ── Calendar ── */
   .cal-event {
@@ -185,11 +207,14 @@
     padding: 8px 0; border-bottom: 1px solid var(--line2); font-size: 14px;
   }
   .cal-event:last-child { border-bottom: none; }
-  .cal-time { font-size: 12px; color: var(--muted); min-width: 70px; flex-shrink: 0; margin-top: 2px; }
+  .cal-time { font-family: var(--mono); font-size: 11px; color: var(--muted); min-width: 74px; flex-shrink: 0; margin-top: 3px; }
   .cal-title { flex: 1; }
-  .cal-impact { font-size: 11px; border-radius: 5px; padding: 2px 7px; font-weight: 600; flex-shrink: 0; margin-top: 2px; }
-  .cal-high   { background: #4a1010; color: #f5a0a0; }
-  .cal-medium { background: var(--amber-bg); color: var(--amber-tx); }
+  .cal-impact {
+    font-family: var(--mono); font-size: 10px; font-weight: 600;
+    padding: 2px 7px; flex-shrink: 0; margin-top: 2px; border: 1px solid;
+  }
+  .cal-high   { background: var(--red-bg); color: var(--red-tx); border-color: var(--red-tx); }
+  .cal-medium { background: var(--amber-bg); color: var(--amber-tx); border-color: var(--amber-tx); }
 
   /* ── Footer ── */
   footer {
@@ -197,14 +222,14 @@
     padding: 24px 0 40px; border-top: 1px solid var(--line); margin-top: 12px;
     line-height: 2;
   }
-  footer a { color: var(--gold); text-decoration: none; }
+  footer a { color: var(--accent); text-decoration: none; }
 
-  /* ── Loading skeleton ── */
+  /* ── Skeleton ── */
   .skeleton {
     background: linear-gradient(90deg, var(--line) 25%, var(--line2) 50%, var(--line) 75%);
     background-size: 200% 100%;
     animation: shimmer 1.5s infinite;
-    border-radius: 6px; height: 18px; margin: 6px 0;
+    height: 18px; margin: 6px 0;
   }
   @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
   .skeleton.w60 { width: 60%; }
@@ -212,62 +237,58 @@
   .skeleton.w40 { width: 40%; }
   .skeleton.h32 { height: 32px; }
 
-  /* ── Error state ── */
+  /* ── Error ── */
   .error-card {
     background: var(--red-bg); color: var(--red-tx);
-    border-radius: 14px; padding: 20px; text-align: center; margin: 20px 0;
+    border: 1px solid var(--red-tx);
+    padding: 20px; text-align: center; margin: 20px 0;
   }
   .error-card h3 { font-size: 16px; margin-bottom: 6px; }
   .error-card p { font-size: 14px; }
+  .error-card code { font-family: var(--mono); font-size: 13px; }
 
-  /* ── Scroll to top ── */
+  /* ── Back top ── */
   .back-top {
     position: fixed; bottom: 20px; right: 16px; z-index: 200;
-    width: 40px; height: 40px; border-radius: 12px;
-    background: var(--gold); color: white; border: none;
-    font-size: 18px; cursor: pointer;
-    box-shadow: 0 2px 8px rgba(0,0,0,.2);
+    width: 40px; height: 40px;
+    background: var(--card); color: var(--accent);
+    border: 1px solid var(--line);
+    font-family: var(--mono); font-size: 16px; cursor: pointer;
     display: none; align-items: center; justify-content: center;
-    transition: opacity .2s;
   }
+  .back-top:hover { border-color: var(--accent); }
 </style>
 </head>
 <body>
 
-<!-- ── Top Bar ── -->
 <div class="topbar">
   <div class="topbar-left">
-    <div class="logo">🏆 Gold <span>AI</span> Live</div>
-    <span class="live-dot" id="liveDot">กำลังโหลด...</span>
+    <div class="logo"><span class="prompt">&gt;</span> gold_ai_live<span class="cursor">_</span></div>
+    <span class="live-dot" id="liveDot">loading...</span>
   </div>
-  <button class="refresh-btn" onclick="load(true)">↻ รีเฟรช</button>
+  <button class="refresh-btn" onclick="load(true)">[ refresh ]</button>
 </div>
 
 <div class="page">
 
-  <!-- Stale banner -->
   <div class="stale-banner" id="staleBanner">
-    <span>⚠️</span>
+    <span>⚠</span>
     <span>บทวิเคราะห์นี้เก่ากว่า 3 ชั่วโมงแล้ว — กราฟราคาข้างบนคือของสด แต่แผนอาจไม่ทันสถานการณ์</span>
   </div>
 
-  <!-- Next update countdown -->
   <div class="next-update" id="nextUpdateRow" style="display:none;">
-    <div class="next-update-label" id="nextUpdateLabel">อัปเดตถัดไป</div>
+    <div class="next-update-label" id="nextUpdateLabel">next_update</div>
     <div class="next-update-time" id="nextUpdateTime">—</div>
     <div class="countdown-bar-bg"><div class="countdown-bar-fill" id="countdownBar" style="width:0%"></div></div>
   </div>
 
-  <!-- TradingView Chart -->
   <div class="tv-wrap">
     <iframe id="tvchart" title="กราฟราคาทองสด"
-      src="https://s.tradingview.com/widgetembed/?frameElementId=tvchart&symbol=OANDA%3AXAUUSD&interval=15&hidesidetoolbar=1&hidetoptoolbar=0&saveimage=0&toolbarbg=0c1322&theme=dark&style=1&timezone=Asia%2FBangkok&locale=th_TH&hide_legend=0"
-      style="width:100%; height:300px; border:0;" loading="lazy"></iframe>
+      src="https://s.tradingview.com/widgetembed/?frameElementId=tvchart&symbol=OANDA%3AXAUUSD&interval=15&hidesidetoolbar=1&hidetoptoolbar=0&saveimage=0&toolbarbg=F5F2EE&theme=light&style=1&timezone=Asia%2FBangkok&locale=th_TH&hide_legend=0"
+      style="width:100%; height:300px; border:0; display:block;" loading="lazy"></iframe>
   </div>
 
-  <!-- Main content -->
   <div id="mainContent">
-    <!-- skeleton loader -->
     <div id="skeleton">
       <div class="card">
         <div class="skeleton h32 w60"></div>
@@ -283,9 +304,8 @@
     <div id="latest"></div>
   </div>
 
-  <!-- History -->
   <div class="history-card" id="historyWrap" style="display:none;">
-    <div class="card-label">📜 รายงานย้อนหลัง</div>
+    <div class="card-label">รายงานย้อนหลัง</div>
     <div id="history"></div>
   </div>
 
@@ -297,9 +317,13 @@
   </footer>
 </div>
 
-<!-- Scroll to top -->
-<button class="back-top" id="backTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+<button class="back-top" id="backTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">^</button>
 <script>
+if (matchMedia('(prefers-color-scheme: dark)').matches) {
+  const tv = document.getElementById('tvchart');
+  tv.src = tv.src.replace('theme=light','theme=dark').replace('toolbarbg=F5F2EE','toolbarbg=22272E');
+}
+
 function esc(s) {
   return String(s ?? '').replace(/[&<>"]/g,
     c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -307,22 +331,22 @@ function esc(s) {
 function verdictCls(v) {
   if (!v) return 'v-red';
   const c0 = v.codePointAt(0);
-  if (c0 === 0x1F7E2) return 'v-green'; // 🟢
-  if (c0 === 0x1F7E1) return 'v-amber'; // 🟡
+  if (c0 === 0x1F7E2) return 'v-green';
+  if (c0 === 0x1F7E1) return 'v-amber';
   return 'v-red';
 }
 function confColor(c) {
-  if (c == null) return '#ccc';
-  if (c >= 7) return '#4caf50';
-  if (c >= 5) return '#ef9f27';
-  return '#e53e3e';
+  if (c == null) return 'var(--muted2)';
+  if (c >= 7) return 'var(--green-tx)';
+  if (c >= 5) return 'var(--amber-tx)';
+  return 'var(--red-tx)';
 }
 
 function renderCalendarText(text) {
   if (!text) return '<span style="color:var(--muted)">ไม่มีข้อมูล</span>';
   const lines = text.split('\n').filter(l => l.trim());
   if (lines.length === 1 && lines[0].includes('ไม่มีข่าว')) {
-    return '<div style="color:var(--muted);font-size:14px">✅ ไม่มีข่าวสำคัญใน 48 ชม. ถัดไป</div>';
+    return '<div style="color:var(--muted);font-size:14px">ไม่มีข่าวสำคัญใน 48 ชม. ถัดไป ✓</div>';
   }
   return lines.map(line => {
     const m = line.match(/^[•\-]?\s*(\S+\s+\S+)\s*(?:น\.)?\s*[—–\-]\s*(.+?)(\s*🔥)?$/);
@@ -331,7 +355,7 @@ function renderCalendarText(text) {
     return `<div class="cal-event">
       <div class="cal-time">${esc(m[1])}</div>
       <div class="cal-title">${esc(m[2].trim())}</div>
-      ${isHigh ? '<span class="cal-impact cal-high">แรงมาก</span>' : '<span class="cal-impact cal-medium">ปานกลาง</span>'}
+      ${isHigh ? '<span class="cal-impact cal-high">HIGH</span>' : '<span class="cal-impact cal-medium">MED</span>'}
     </div>`;
   }).join('');
 }
@@ -345,29 +369,29 @@ function renderEntry(e) {
     ${e.flags && e.flags.length ? `<div class="flags">${e.flags.map(f=>`<span>${esc(f)}</span>`).join('')}</div>` : ''}
   </div>
   <div class="card">
-    <div class="card-label">💰 ราคาทองตอนวิเคราะห์</div>
+    <div class="card-label">ราคาทองตอนวิเคราะห์</div>
     <div class="price-big">${esc(e.price)}
       <span class="price-change">${(e.change > 0 ? '+' : '') + esc(e.change)}% วันนี้</span>
     </div>
-    <span class="source-badge source-mt5">✅ ราคาสดจากโบรก MT5</span>
+    <span class="source-badge">${e.source === 'MT5' ? 'LIVE · MT5' : 'DELAYED · YAHOO'}</span>
     <div class="price-meta">ภาพรวม: ${esc(e.trend)}</div>
     <div class="price-row">
-      <div class="price-chip"><div class="price-chip-label">ต่ำสุดวัน</div><div class="price-chip-val">${esc(e.day_low)}</div></div>
-      <div class="price-chip"><div class="price-chip-label">สูงสุดวัน</div><div class="price-chip-val">${esc(e.day_high)}</div></div>
+      <div class="price-chip"><div class="price-chip-label">LOW</div><div class="price-chip-val">${esc(e.day_low)}</div></div>
+      <div class="price-chip"><div class="price-chip-label">HIGH</div><div class="price-chip-val">${esc(e.day_high)}</div></div>
     </div>
     ${e.momentum ? `<div class="price-meta" style="margin-top:8px">${esc(e.momentum)}</div>` : ''}
   </div>
   <div class="card">
-    <div class="card-label">📰 ข่าวที่ต้องรู้</div>
+    <div class="card-label">ข่าวที่ต้องรู้</div>
     <div class="body-text">${esc(e.news)}</div>
   </div>
   <div class="card">
-    <div class="card-label">🎯 แผนเทรด (intraday)</div>
+    <div class="card-label">แผนเทรด — intraday</div>
     <div class="body-text">${esc(e.plan)}</div>
   </div>
   <div class="card-checker">
-    <div class="card-label">🛡 เสียงค้าน — อ่านก่อนตัดสินใจเสมอ</div>
-    ${conf != null ? `<span class="conf-badge">ความเชื่อมั่นในแผน ${esc(conf)}/10</span>
+    <div class="card-label">เสียงค้าน — อ่านก่อนตัดสินใจเสมอ</div>
+    ${conf != null ? `<span class="conf-badge">CONFIDENCE ${esc(conf)}/10</span>
     <div class="conf-bar-wrap">
       <div class="conf-bar-bg"><div class="conf-bar-fill" style="width:${confPct}%;background:${confColor(conf)}"></div></div>
       <div class="conf-bar-label">${conf >= 7 ? 'แผนผ่าน' : conf >= 5 ? 'มีจุดระวัง' : 'แผนมีจุดอ่อน'}</div>
@@ -375,7 +399,7 @@ function renderEntry(e) {
     <div class="body-text" style="margin-top:10px">${esc(e.check)}</div>
   </div>
   <div class="card">
-    <div class="card-label">📅 ประกาศสำคัญที่กำลังจะมา (เวลาไทย)</div>
+    <div class="card-label">ประกาศสำคัญที่กำลังจะมา — เวลาไทย</div>
     ${renderCalendarText(cal)}
   </div>`;
 }
@@ -391,14 +415,14 @@ function startCountdown(fromTimeMs) {
     const now = Date.now();
     const nextMs = fromTimeMs + 1 * 3600 * 1000;
     const diff = nextMs - now;
-    if (diff <= 0) { timeEl.textContent = 'กำลังอัปเดต...'; bar.style.width='100%'; return; }
+    if (diff <= 0) { timeEl.textContent = 'updating...'; bar.style.width='100%'; return; }
     const m = Math.floor(diff / 60000);
     const s = Math.floor((diff % 60000) / 1000);
     const elapsed = now - fromTimeMs;
     const pct = Math.min(100, Math.round((elapsed / 3600000) * 100));
-    timeEl.textContent = m + ' นาที ' + s + ' วินาที';
+    timeEl.textContent = m + 'm ' + String(s).padStart(2, '0') + 's';
     bar.style.width = pct + '%';
-    label.textContent = 'ผ่านไปแล้ว';
+    label.textContent = 'next_update';
     row.style.display = 'flex';
   }
   tick();
@@ -420,9 +444,8 @@ async function load(force) {
     const latest = data[0];
     document.getElementById('skeleton').style.display = 'none';
     document.getElementById('latest').innerHTML = renderEntry(latest);
-    dot.textContent = 'อัปเดต ' + latest.time;
+    dot.textContent = 'sync ' + latest.time;
     dot.className = 'live-dot';
-    // stale check
     const m2 = (latest.time||'').match(/(\d{2})\/(\d{2})\/(\d{4}) (\d{2}):(\d{2})/);
     if (m2) {
       const t = new Date(+m2[3], +m2[2]-1, +m2[1], +m2[4], +m2[5]);
@@ -430,7 +453,6 @@ async function load(force) {
         document.getElementById('staleBanner').style.display = 'flex';
       startCountdown(t.getTime());
     }
-    // history
     const hist = data.slice(1, 25);
     if (hist.length) {
       document.getElementById('history').innerHTML = hist.map(e => `
@@ -448,12 +470,12 @@ async function load(force) {
     if (!document.getElementById('latest').innerHTML) {
       document.getElementById('latest').innerHTML = `
         <div class="error-card">
-          <h3>⚠️ โหลดข้อมูลไม่สำเร็จ</h3>
+          <h3>โหลดข้อมูลไม่สำเร็จ</h3>
           <p>ยังไม่มีไฟล์ข้อมูล หรือระบบยังไม่ได้รัน<br>
           ลอง: <code>python main.py scan</code></p>
         </div>`;
     }
-    dot.textContent = 'โหลดไม่ได้'; dot.className = 'live-dot error';
+    dot.textContent = 'offline'; dot.className = 'live-dot error';
   }
 }
 
